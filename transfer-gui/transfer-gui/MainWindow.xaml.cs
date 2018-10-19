@@ -1,18 +1,12 @@
-﻿using System;
+﻿using Neo.Implementations.Wallets.EntityFramework;
+using Neo.Implementations.Wallets.NEP6;
+using Neo.Wallets;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace transfer_gui
 {
@@ -21,6 +15,9 @@ namespace transfer_gui
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Wallet wallet;
+        private String connectionString;
+        private DBType dBType;
         public MainWindow()
         {
             InitializeComponent();
@@ -28,7 +25,34 @@ namespace transfer_gui
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
+            if (dBType < 0)
+            {
+                MessageBox.Show("数据库类型读取错误！");
+                return;
+            }
+            if (wallet == null)
+            {
+                MessageBox.Show("钱包数据读取错误！");
+                return;
+            }
+            if (connectionString == null)
+            {
+                MessageBox.Show("数据库连接字符串错误！");
+                return;
+            }
 
+            switch (dBType)
+            {
+                case DBType.MySQL:
+                    ExportMySQL(wallet, connectionString);
+                    break;
+                case DBType.Mongo:
+                    ExportMongo(wallet, connectionString);
+                    break;
+                default:
+                    MessageBox.Show("未知的数据库类型");
+                    break;
+            }
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
@@ -43,17 +67,41 @@ namespace transfer_gui
             {
                 try
                 {
-                    //accountA = new Account(walletfile.walletPathA, walletfile.walletPasswordA, "KxC7fxvBgNNeiFmcp1gRzN6ZfSFXfxrTC6WDXAFjhWDqrknoZUrv");
-                    //accountB = new Account(walletfile.walletPathB, walletfile.walletPasswordB, "KwPRvCPeoe2y2CvqFypAzv5nVKjziQPStHrFndZQAS5MjQbgrC5C");
+                    wallet = OpenWallet(config.walletPath, config.walletPassword);
                 }
                 catch (CryptographicException)
                 {
                     MessageBox.Show("密码错误！");
                     return;
                 }
+
+                dBType = (DBType)Enum.ToObject(typeof(DBType), config.dbType);
+                connectionString = config.connectionString;
             }
         }
 
+        private static Wallet OpenWallet(string path, string password)
+        {
+            if (Path.GetExtension(path) == ".db3")
+            {
+                return UserWallet.Open(path, password);
+            }
+            else //.json
+            {
+                NEP6Wallet nep6wallet = new NEP6Wallet(path);
+                nep6wallet.Unlock(password);
+                return nep6wallet;
+            }
+        }
 
+        private static void ExportMongo(Wallet wallet, string connectionString)
+        {
+
+        }
+
+        private static void ExportMySQL(Wallet wallet, string connectionString)
+        {
+
+        }
     }
 }
