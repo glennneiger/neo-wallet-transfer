@@ -1,0 +1,176 @@
+{
+    "name": null,
+    "version": "1.0",
+    "scrypt": {
+        "n": 16384,
+        "r": 8,
+        "p": 8
+    },
+    "accounts": [{
+        "address": "AXdpkMUSNWGFiQUNTNKiqje4HH6wS4US9D",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYRugTqtpvDUcX7XzqMpW3J5Pv2PsBYDTnX8qLcEgveycgWMgontrSgGC",
+        "contract": {
+            "script": "2102fda967adbd41295a5e00e0c53cbfc3b49dc89b3b38d30ccb0757ecf40b64d435ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AHP2SN6zwmmSEvyKf1N4dyiiKbKSbjeNJi",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYUDYivPvgSNUsXQreuauoKzAQc8XKQuX38GgxJYCPhtUawedJUMg1iQJ",
+        "contract": {
+            "script": "21020f09055cf50a6003500bde0336e27233ed51cde02bd56a0bd06d3320362dbfdeac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "ARzc7ZUrdq38xVrJD1hia6dLgfMyXi5CvV",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYLZKXqHwBok2Fs1ZzFEaHmoBCxCMfkUrzKAuHPgZX9jsKP2reKvyUYTd",
+        "contract": {
+            "script": "2102f99acc490616514ccadc4fb0b0bec5206771a6a6c078096095ead342585ab84bac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "ASjLmo1kGzA4xHFj68vo6XeXKDsXJxJUQL",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYUoYmjqR7bdJn81Gbh63Uk8qjDhZRZWt2yUAQLFMRBruDuW89t39usEY",
+        "contract": {
+            "script": "21025f0eb6d549ced4e2ef432c95a3a6290a1a60ebd58722c55e128ae969747c6e05ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "Af4Uwd7Qe9BMtjDpQbsKwK4vi3QacN1Rb9",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYRdTg7rf8CPhWACMcK8jGpM5hWXnTkGxWRRtAU6LUoaVc9nMocixSggX",
+        "contract": {
+            "script": "2103836f79e802eccbd0e4310eb3092f97e45f1674c08430258285b229279283442aac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AciDb22CfYBWQHFaB5kNkQ4EmHyBjv5ZHJ",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYUGUftGAGBtry89f5jE7E9cgfAnC9i3Z1jSYgh4EVVkYgHhcV99fWhj2",
+        "contract": {
+            "script": "2102004bfad898972c3a280826b0189b0603b35ea29e70bca909eb61e8b85288a8f8ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AVGJc8PZeQ6Bm2v6Mn62rpKKDeLUvinupw",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYTtezgbZpHvrVgodync6znYPeErJwpmqveDJXc2GLYmfLQSPc7qUwyRJ",
+        "contract": {
+            "script": "2103e054cdbde582292f7c209128b6494341f4f148ef3ab1476743364080c9c6a693ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "Aa5K2Cj2fujo16TrSFWGQMALAPyGHJE52G",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYUrqZd2yymiQ6VTqv1sbcZCL6SPjjLH1ikL1DaDAq3oyqmGybwUzNcrR",
+        "contract": {
+            "script": "2102bb8b4d92ac33b1b6d0d308165a7e469a19eea55f98b7e2d6fc99a7e3d55f6745ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AKoTXC6WLXPZ2QpxZttrNfe9KDnvy6DcXQ",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYRpb37dGPWuKJcEF3bFvifaJBuZineqA9N2F7iMxz68By88iNs7W5oBi",
+        "contract": {
+            "script": "2102c6a7aa32213beb6fd510d9c58a3898c39c1a3af4c89f53506d2cedc7410d9d34ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AMPgJG9g4huVs6pBpfGWzkC4uGifh5Ryd7",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYSMf7tGdZz1P4mM8pLHWcphnY9Cdm8kn71XmTbeSthFifFT3j1NxbXdr",
+        "contract": {
+            "script": "21024b0c41a569687a801a9455e56fb2e6b168e0ccf6e255d05a7c5ee33dc12e9588ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }, {
+        "address": "AKKsC53WvibAQNBzCutUogGFTNX3mJoVsk",
+        "label": null,
+        "isDefault": false,
+        "lock": false,
+        "key": "6PYUHcZZwfANP3xAwbZgfrVW1v1RFpgrSemF7nDLZ3oU59UYxXyfA5F8jg",
+        "contract": {
+            "script": "2103c4bb6bcb4aa86158c959f8efcb78163a304c849bb3b28f029ff8ef5e02c83ce2ac",
+            "parameters": [{
+                "name": "signature",
+                "type": "Signature"
+            }],
+            "deployed": false
+        },
+        "extra": null
+    }],
+    "extra": null
+}
