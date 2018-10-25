@@ -2,9 +2,7 @@
 using Neo.Implementations.Wallets.NEP6;
 using Neo.Wallets;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Windows;
 
@@ -96,12 +94,28 @@ namespace transfer_gui
 
         private static void ExportMongo(Wallet wallet, string connectionString)
         {
-
+            MongoConnector mongo = new MongoConnector(connectionString);
+            if (wallet is NEP6Wallet)
+            {
+                mongo.ExportNEP6Wallet(wallet as NEP6Wallet);
+            }
+            else
+            {
+                mongo.ExportUserWallet(wallet as UserWallet);
+            }
         }
 
         private static void ExportMySQL(Wallet wallet, string connectionString)
         {
-
+            MySQLConnector mySQL = new MySQLConnector(connectionString);
+            if (wallet is NEP6Wallet)
+            {
+                mySQL.ExportNEP6Wallet(wallet as NEP6Wallet);
+            }
+            else
+            {
+                mySQL.ExportUserWallet(wallet as UserWallet);
+            }
         }
     }
 }

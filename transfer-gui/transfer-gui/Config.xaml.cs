@@ -1,17 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace transfer_gui
 {
@@ -35,7 +24,7 @@ namespace transfer_gui
             OpenFileDialog dlg = new OpenFileDialog();
             dlg.FileName = "请选择钱包文件";
             dlg.DefaultExt = ".db3";
-            dlg.Filter = "全部文件类型|*.*|(*.db3)|*.db3";
+            dlg.Filter = "全部文件类型|*.*|(*.db3)|*.db3|(*.json)|*.json";
 
             bool? result = dlg.ShowDialog();
             if (result == true)
