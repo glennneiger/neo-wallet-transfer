@@ -2,9 +2,12 @@
 using Neo.Implementations.Wallets.NEP6;
 using Neo.Wallets;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Security.Cryptography;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace transfer_gui
 {
@@ -14,10 +17,20 @@ namespace transfer_gui
     public partial class MainWindow : Window
     {
         private Wallet wallet;
-        private String connectionString;
+        private string connectionString;
+        private string path;
+        private string password;
         private DBType dBType;
+
+        ObservableCollection<RecordInfo> recordInfoList = new ObservableCollection<RecordInfo>();
+        internal ObservableCollection<RecordInfo> RecordInfoList
+        {
+            get { return recordInfoList; }
+            set { recordInfoList = value; }
+        }
         public MainWindow()
         {
+            this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
             InitializeComponent();
         }
 
@@ -39,18 +52,39 @@ namespace transfer_gui
                 return;
             }
 
+            string result = null;
             switch (dBType)
             {
                 case DBType.MySQL:
-                    ExportMySQL(wallet, connectionString);
+                    result = ExportMySQL(wallet, path, password, connectionString);
                     break;
                 case DBType.Mongo:
-                    ExportMongo(wallet, connectionString);
+                    result = ExportMongo(wallet, path, password, connectionString);
                     break;
                 default:
                     MessageBox.Show("未知的数据库类型");
                     break;
             }
+
+            this.Dispatcher.Invoke(DispatcherPriority.Send, new Action(() =>
+            {
+                this.RecordInfoList.Add(new RecordInfo(result));
+                this.listView.ScrollIntoView(this.listView.Items[this.listView.Items.Count - 1]);
+                GridView gv = listView.View as GridView;
+                if (gv != null)
+                {
+                    foreach (GridViewColumn gvc in gv.Columns)
+                    {
+                        gvc.Width = gvc.ActualWidth;
+                        gvc.Width = Double.NaN;
+                    }
+                }
+            }));
+        }
+
+        void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource = RecordInfoList;
         }
 
         private void btnStop_Click(object sender, RoutedEventArgs e)
@@ -74,6 +108,8 @@ namespace transfer_gui
                 }
 
                 dBType = (DBType)Enum.ToObject(typeof(DBType), config.dbType);
+                path = config.walletPath;
+                password = config.walletPassword;
                 connectionString = config.connectionString;
             }
         }
@@ -82,7 +118,10 @@ namespace transfer_gui
         {
             if (Path.GetExtension(path) == ".db3")
             {
-                return UserWallet.Open(path, password);
+                string path_new = Path.ChangeExtension(path, ".json");
+                NEP6Wallet nep6wallet = NEP6Wallet.Migrate(path_new, path, password);
+                nep6wallet.Save();
+                return nep6wallet;
             }
             else //.json
             {
@@ -92,30 +131,33 @@ namespace transfer_gui
             }
         }
 
-        private static void ExportMongo(Wallet wallet, string connectionString)
+        private static string ExportMongo(Wallet wallet, string path, string password, string connectionString)
         {
             MongoConnector mongo = new MongoConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
-                mongo.ExportNEP6Wallet(wallet as NEP6Wallet);
+                return mongo.ExportNEP6Wallet(path, password);
             }
             else
             {
-                mongo.ExportUserWallet(wallet as UserWallet);
+                //result = mongo.ExportUserWallet(path, password);
             }
+
+            return null;
         }
 
-        private static void ExportMySQL(Wallet wallet, string connectionString)
+        private static string ExportMySQL(Wallet wallet, string path, string password, string connectionString)
         {
             MySQLConnector mySQL = new MySQLConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
-                mySQL.ExportNEP6Wallet(wallet as NEP6Wallet);
+                return mySQL.ExportNEP6Wallet(path, password);
             }
             else
             {
-                mySQL.ExportUserWallet(wallet as UserWallet);
+                //mySQL.ExportUserWallet(path, password);
             }
+            return null;
         }
     }
 }

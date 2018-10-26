@@ -27,13 +27,13 @@ namespace transfer_gui
         }
         private MySQLConnector() { }
 
-        public void ExportNEP6Wallet(NEP6Wallet wallet)
+        public string ExportNEP6Wallet(string path, string password)
         {
             try
             {
                 conn.Open();
 
-
+                //in the future
 
                 conn.Close();
             }
@@ -41,15 +41,17 @@ namespace transfer_gui
             {
 
             }
+
+            return null;
         }
 
-        public void ExportUserWallet(UserWallet wallet)
+        public string ExportUserWallet(string path, string password)
         {
             try
             {
                 conn.Open();
 
-
+                //not ever used
 
                 conn.Close();
             }
@@ -57,6 +59,8 @@ namespace transfer_gui
             {
 
             }
+
+            return null;
         }
     }
 }

@@ -1,12 +1,7 @@
-﻿using Neo.Implementations.Wallets.EntityFramework;
-using Neo.Implementations.Wallets.NEP6;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.IO;
 
 namespace transfer_gui
 {
@@ -19,14 +14,36 @@ namespace transfer_gui
         }
         private MongoConnector() { }
 
-        public void ExportNEP6Wallet(NEP6Wallet wallet)
+        public string ExportNEP6Wallet(string path, string password)
         {
+            try
+            {
+                string path_new = Path.ChangeExtension(path, ".json");
+                StreamReader r = new StreamReader(path_new);
 
+                string json = r.ReadToEnd();
+                BsonDocument document = BsonDocument.Parse(json);
+
+                BsonElement psw = new BsonElement("password", password);
+                document = document.Add(psw);
+
+                var db = conn.GetDatabase("neo");
+                var collection = db.GetCollection<BsonDocument>("wallet");
+
+                collection.InsertOne(document);
+
+                return document.ToJson();
+            }
+            catch (Exception e)
+            {
+                return "Export Failed!";
+            }
         }
 
-        public void ExportUserWallet(UserWallet wallet)
+        public string ExportUserWallet(string path, string password)
         {
-
+            //not ever used
+            return null;
         }
     }
 }

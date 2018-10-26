@@ -16,11 +16,7 @@
         <ListView x:Name="listView"  Grid.Row="1" Margin="0,0.6,-0.4,1.4" >
             <ListView.View>
                 <GridView >
-                    <GridViewColumn Header="result"  Width="400" DisplayMemberBinding="{Binding Path=Result}"/>
-                    <GridViewColumn Header="availableA"  Width="150"  DisplayMemberBinding="{Binding Path=availableA}"/>
-                    <GridViewColumn Header="balanceA"  Width="150"  DisplayMemberBinding="{Binding Path=balanceA}"/>
-                    <GridViewColumn Header="availableB"  Width="150"  DisplayMemberBinding="{Binding Path=availableB}"/>
-                    <GridViewColumn Header="balanceB"  Width="150"  DisplayMemberBinding="{Binding Path=balanceB}"/>
+                    <GridViewColumn Header="result"  Width="1000" DisplayMemberBinding="{Binding Path=Result}"/>
                 </GridView>
             </ListView.View>
         </ListView>
