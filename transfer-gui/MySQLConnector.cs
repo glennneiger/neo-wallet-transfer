@@ -1,12 +1,6 @@
 ﻿using MySql.Data.MySqlClient;
-using Neo.Implementations.Wallets.EntityFramework;
-using Neo.Implementations.Wallets.NEP6;
-using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
+using Newtonsoft.Json.Linq;
 
 namespace transfer_gui
 {
@@ -20,8 +14,9 @@ namespace transfer_gui
 
             conn.Open();
 
-            string cmdStr = "";
+            string cmdStr = "CREATE TABLE IF NOT EXISTS wallet ( uid int AUTO_INCREMENT, data JSON, PRIMARY KEY(uid))engine = innodb; ";
             MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
+            int result = cmd.ExecuteNonQuery();
 
             conn.Close();
         }
@@ -29,20 +24,31 @@ namespace transfer_gui
 
         public string ExportNEP6Wallet(string path, string password)
         {
+            string path_new = Path.ChangeExtension(path, ".json");
+            StreamReader r = new StreamReader(path_new);
+
+            string json = r.ReadToEnd();
+
             try
             {
-                conn.Open();
+                conn.Open();                
 
-                //in the future
+                JObject jo = JObject.Parse(json);
+                jo.Add("password", password);
+
+                string cmdStr = "insert into user values(NULL, " + jo.ToString() + ");";
+
+                MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
+                int result = cmd.ExecuteNonQuery();
 
                 conn.Close();
+
+                return cmdStr;
             }
             catch(MySqlException e)
             {
-
+                return "Export Failed!";
             }
-
-            return null;
         }
 
         public string ExportUserWallet(string path, string password)

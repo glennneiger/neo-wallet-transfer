@@ -1,5 +1,7 @@
-﻿using Neo.Implementations.Wallets.EntityFramework;
+﻿using Neo.Core;
+using Neo.Implementations.Blockchains.LevelDB;
 using Neo.Implementations.Wallets.NEP6;
+using Neo.Network;
 using Neo.Wallets;
 using System;
 using System.Collections.ObjectModel;
@@ -8,6 +10,7 @@ using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using transfer_gui.Properties;
 
 namespace transfer_gui
 {
@@ -16,6 +19,8 @@ namespace transfer_gui
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static LocalNode LocalNode = new LocalNode();
+
         private Wallet wallet;
         private string connectionString;
         private string path;
@@ -84,6 +89,8 @@ namespace transfer_gui
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            LocalNode.UpnpEnabled = true;
+            LocalNode.Start(Settings.Default.NodePort);
             listView.ItemsSource = RecordInfoList;
         }
 
@@ -140,7 +147,7 @@ namespace transfer_gui
             }
             else
             {
-                //result = mongo.ExportUserWallet(path, password);
+                //never reach here
             }
 
             return null;
@@ -155,7 +162,7 @@ namespace transfer_gui
             }
             else
             {
-                //mySQL.ExportUserWallet(path, password);
+                //never reach here
             }
             return null;
         }
