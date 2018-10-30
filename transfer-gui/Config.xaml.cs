@@ -50,12 +50,12 @@ namespace transfer_gui
             {
                 case (int)DBType.Mongo:
                     if (userName.Length < 1)
-                        connectionString = "MongoDB: mongodb://" + host;
+                        connectionString = "mongodb://" + host;
                     else
-                        connectionString = "MongoDB: mongodb://" + userName + ":" + dbPassword + "@" + host;
+                        connectionString = "mongodb://" + userName + ":" + dbPassword + "@" + host;
                     break;
                 case (int)DBType.MySQL:
-                    connectionString = "MySQL: Host=" + host + "; UserName=" + userName + "; Password=" + dbPassword + "; Database=" + dbName + ";";
+                    connectionString = "Host=" + host + "; UserName=" + userName + "; Password=" + dbPassword + "; Database=" + dbName + ";";
                     break;
                 default:
                     break;
@@ -73,7 +73,7 @@ namespace transfer_gui
             {
                 MessageBox.Show("MySQL连接信息不足！");
             }
-            else if (dbType == (int)DBType.Mongo && (userName != "" || dbPassword == ""))
+            else if (dbType == (int)DBType.Mongo && userName == "" && dbPassword != "")
             {
                 MessageBox.Show("MongoDB缺少相应的用户名！");
             }
