@@ -1,6 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using System;
 
 namespace transfer_gui
 {
@@ -35,15 +36,15 @@ namespace transfer_gui
 
                 JObject jo = JObject.Parse(json);
                 jo.Add("password", password);
-
-                string cmdStr = "insert into user values(NULL, " + jo.ToString() + ");";
+                string cmdStr = "INSERT INTO wallet VALUES(NULL, \'" + jo + "\');";
+                Console.WriteLine(cmdStr);
 
                 MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                 int result = cmd.ExecuteNonQuery();
 
                 conn.Close();
 
-                return cmdStr;
+                return jo.ToString().Replace("\n", "").Replace("\r", "");
             }
             catch(MySqlException e)
             {

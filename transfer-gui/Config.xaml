@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:transfer_gui"
         mc:Ignorable="d"
-        Title="Config" Height="250" Width="400">
+        Title="Config" Height="280" Width="400">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -17,6 +17,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         <Label x:Name="label" Content="Wallet" HorizontalAlignment="Center" Margin="0" Grid.Row="0" VerticalAlignment="Center"/>
         <Label x:Name="label1" Content="Password" HorizontalAlignment="Center" Margin="0" Grid.Row="1" VerticalAlignment="Center"/>
@@ -31,6 +32,9 @@
             <ComboBoxItem Content="MySQL" IsSelected="True"></ComboBoxItem>
             <ComboBoxItem Content="Mongo"></ComboBoxItem>
         </ComboBox>
+        <Label x:Name="label4" Content="Eg." HorizontalAlignment="Center" Margin="0" Grid.Row="4" VerticalAlignment="Center"/>
+        <TextBlock x:Name="mongo" Text="MongoDB: mongodb://localhost" HorizontalAlignment="Left" Margin="0" Grid.Column="1" Grid.Row="4" VerticalAlignment="Top" TextWrapping="Wrap"/>
+        <TextBlock x:Name="mysql" Text="MySQL: Host=localhost;UserName=root;Password=root;Database=wallet;" HorizontalAlignment="Left" Margin="0" Grid.Column="1" Grid.Row="4" VerticalAlignment="Bottom" TextWrapping="Wrap"/>
     </Grid>
 </Window>
 
