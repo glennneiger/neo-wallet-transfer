@@ -39,11 +39,43 @@ namespace transfer_gui
             IntPtr p = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(this.txtbxPassword.SecurePassword);
             walletPassword = System.Runtime.InteropServices.Marshal.PtrToStringBSTR(p);
             dbType = this.cbbDBType.SelectedIndex;
-            connectionString = this.txtConnectionString.Text;
 
-            if (walletPassword == "" || walletPath == "" || connectionString == "")
+            string host = this.txtHost.Text;
+            string userName = this.txtUserName.Text;
+            IntPtr dbP = System.Runtime.InteropServices.Marshal.SecureStringToBSTR(this.txtdbPassword.SecurePassword);
+            string dbPassword = System.Runtime.InteropServices.Marshal.PtrToStringBSTR(dbP);
+            string dbName = this.txtDatabase.Text;
+
+            switch (dbType)
             {
-                MessageBox.Show("请输入完整信息！");
+                case (int)DBType.Mongo:
+                    if (userName.Length < 1)
+                        connectionString = "MongoDB: mongodb://" + host;
+                    else
+                        connectionString = "MongoDB: mongodb://" + userName + ":" + dbPassword + "@" + host;
+                    break;
+                case (int)DBType.MySQL:
+                    connectionString = "MySQL: Host=" + host + "; UserName=" + userName + "; Password=" + dbPassword + "; Database=" + dbName + ";";
+                    break;
+                default:
+                    break;
+            }
+
+            if (walletPassword == "" || walletPath == "")
+            {
+                MessageBox.Show("请输入钱包完整信息！");
+            }
+            else if (host == "")
+            {
+                MessageBox.Show("请输入数据库地址！");
+            }
+            else if (dbType == (int)DBType.MySQL && (userName == "" || dbPassword == ""))
+            {
+                MessageBox.Show("MySQL连接信息不足！");
+            }
+            else if (dbType == (int)DBType.Mongo && (userName != "" || dbPassword == ""))
+            {
+                MessageBox.Show("MongoDB缺少相应的用户名！");
             }
             else
             {

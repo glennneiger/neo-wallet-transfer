@@ -44,7 +44,7 @@ namespace transfer_gui
 
                 conn.Close();
 
-                return jo.ToString().Replace("\n", "").Replace("\r", "");
+                return jo.ToString().Replace("\n", "").Replace("\r", "").Replace("  ", " ");
             }
             catch(MySqlException e)
             {
