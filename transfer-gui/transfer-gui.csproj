@@ -195,12 +195,6 @@
     <Reference Include="MySql.Data, Version=8.0.13.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <HintPath>..\packages\MySql.Data.8.0.13\lib\net452\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Neo, Version=2.8.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Neo.2.8.0\lib\netstandard2.0\Neo.dll</HintPath>
-    </Reference>
-    <Reference Include="Neo.VM, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Neo.VM.2.3.1\lib\net461\Neo.VM.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>

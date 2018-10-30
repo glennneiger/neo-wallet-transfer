@@ -4,6 +4,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "transfer-gui", "transfer-gui\transfer-gui.csproj", "{B89B4170-36F3-41C0-BCC2-0D8D7D47B1A0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1} = {1B6D74E3-15A1-4BAB-9FC8-885F706815E1}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neo", "neo\neo.csproj", "{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +26,14 @@ Global
 		{B89B4170-36F3-41C0-BCC2-0D8D7D47B1A0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B89B4170-36F3-41C0-BCC2-0D8D7D47B1A0}.Release|x64.ActiveCfg = Release|x64
 		{B89B4170-36F3-41C0-BCC2-0D8D7D47B1A0}.Release|x64.Build.0 = Release|x64
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Debug|x64.Build.0 = Debug|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Release|x64.ActiveCfg = Release|Any CPU
+		{1B6D74E3-15A1-4BAB-9FC8-885F706815E1}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
