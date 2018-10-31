@@ -24,6 +24,19 @@
         <Button x:Name="btnStart" Content="Start" HorizontalAlignment="Left" Height="35" Margin="167,13,0,0" VerticalAlignment="Top" Width="120" Grid.Row="2" Click="btnStart_Click" />
         <Button x:Name="btnStop" Content="Pause" HorizontalAlignment="Left" Height="35" Margin="353,13,0,0" VerticalAlignment="Top" Width="120" Grid.Row="2" Click="btnStop_Click" />
         <Button x:Name="btnConfig" Content="Config" HorizontalAlignment="Left" Height="35" Margin="653,13,0,0" Grid.Row="2" VerticalAlignment="Top" Width="120" Click="btnConfig_Click"/>
-        <StatusBar  Grid.Row="3" />
+        <StatusBar  Grid.Row="3" >
+            <StatusBarItem>
+                <Label Name="lbl1" Content="Height:"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Label Name="lbl_height" Content="0/0"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Label Name="lbl2" Content="Connections:"/>
+            </StatusBarItem>
+            <StatusBarItem>
+                <Label Name="lbl_count_node" Content="0"/>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>

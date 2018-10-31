@@ -4,6 +4,7 @@ using System;
 using Neo.Implementations.Wallets.NEP6;
 using System.Collections.Generic;
 using Neo.IO.Json;
+using System.Linq;
 
 namespace transfer_gui
 {
@@ -23,7 +24,7 @@ namespace transfer_gui
                 MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract ( script VARCHAR(100), deployed TINYINT(1), PRIMARY KEY(script))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract ( script VARCHAR(1000), deployed TINYINT(1), PRIMARY KEY(script))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
@@ -35,29 +36,30 @@ namespace transfer_gui
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.account ( address VARCHAR(45), label VARCHAR(45), isDefault TINYINT(1), locked TINYINT(1), account_key VARCHAR(100), contract_script VARCHAR(100), extra VARCHAR(45), PRIMARY KEY(address), CONSTRAINT `contract_script1` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.account ( address VARCHAR(45), label VARCHAR(45), isDefault TINYINT(1), locked TINYINT(1), account_key VARCHAR(100), contract_script VARCHAR(1000), extra VARCHAR(45), PRIMARY KEY(address), CONSTRAINT `contract_script1` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract2parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(100), parameter_name VARCHAR(45), PRIMARY KEY(uid), CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`), CONSTRAINT `parameter_name1` FOREIGN KEY (`parameter_name`) REFERENCES `parameter` (`name`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract2parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(1000), parameter_name VARCHAR(45), PRIMARY KEY(uid), CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`), CONSTRAINT `parameter_name1` FOREIGN KEY (`parameter_name`) REFERENCES `parameter` (`name`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
                 conn.Close();
             }
-            catch(MySqlException e)
+            catch (MySqlException e)
             {
                 Console.WriteLine(e.StackTrace);
             }
         }
         private MySQLConnector() { }
 
-        public string ExportNEP6Wallet(NEP6Wallet wallet, string path, string password)
+        public string ExportNEP6Wallet(NEP6Wallet wallet, string password)
         {
-            string path_new = Path.ChangeExtension(path, ".json");
-            StreamReader r = new StreamReader(path_new);
-
-            string json = r.ReadToEnd();
+            int wallet_count = 0;
+            int account_count = 0;
+            int contract_count = 0;
+            int scrypt_count = 0;
+            int parameter_count = 0;
 
             try
             {
@@ -65,20 +67,47 @@ namespace transfer_gui
 
                 JObject jWallet = wallet.ToJson();
 
+                bool check = true;
                 try
                 {
-                    // table scrypt
-                    string cmdStr = "INSERT INTO neo.scrypt VALUES(NULL, @n, @r, @p);";
+                    // try get scrypt uid
+                    string cmdStr = "SELECT uid FROM neo.scrypt WHERE n=@n and r=@r and p=@p;";
                     MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                     cmd.Parameters.AddWithValue("@n", ReplaceNull(jWallet["scrypt"]["n"]));
                     cmd.Parameters.AddWithValue("@r", ReplaceNull(jWallet["scrypt"]["r"]));
                     cmd.Parameters.AddWithValue("@p", ReplaceNull(jWallet["scrypt"]["n"]));
-                    int result = cmd.ExecuteNonQuery();
+                    MySqlDataReader rdr = cmd.ExecuteReader();
+
+                    if (rdr.Read())
+                        if (rdr.HasRows)
+                            check = false;
+                    rdr.Close();
+
+                    scrypt_count++;
                 }
                 catch (MySqlException e)
                 {
                     Console.WriteLine(e.StackTrace);
-                    return "Export Failed!";
+                    return "Query Failed!";
+                }
+
+                if (check)
+                {
+                    try
+                    {
+                        // table scrypt
+                        string cmdStr = "INSERT INTO neo.scrypt VALUES(NULL, @n, @r, @p);";
+                        MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
+                        cmd.Parameters.AddWithValue("@n", ReplaceNull(jWallet["scrypt"]["n"]));
+                        cmd.Parameters.AddWithValue("@r", ReplaceNull(jWallet["scrypt"]["r"]));
+                        cmd.Parameters.AddWithValue("@p", ReplaceNull(jWallet["scrypt"]["n"]));
+                        int result = cmd.ExecuteNonQuery();
+                    }
+                    catch (MySqlException e)
+                    {
+                        Console.WriteLine(e.StackTrace);
+                        return "Export Failed!";
+                    }
                 }
 
                 int scrypt_id = 0;
@@ -93,7 +122,8 @@ namespace transfer_gui
                     MySqlDataReader rdr = cmd.ExecuteReader();
 
                     if (rdr.Read())
-                        scrypt_id = rdr.GetInt32("uid");
+                        if (rdr.HasRows)
+                            scrypt_id = rdr.GetInt32("uid");
                     rdr.Close();
 
                     if (scrypt_id == 0)
@@ -118,6 +148,8 @@ namespace transfer_gui
                     cmd.Parameters.AddWithValue("@password", ReplaceNull(password));
                     cmd.Parameters.AddWithValue("@extra", ReplaceNull(jWallet["extra"]));
                     int result = cmd.ExecuteNonQuery();
+
+                    wallet_count++;
                 }
                 catch (MySqlException e)
                 {
@@ -138,6 +170,8 @@ namespace transfer_gui
                         cmd.Parameters.AddWithValue("@script", ReplaceNull(jAccount["contract"]["script"]));
                         cmd.Parameters.AddWithValue("@deployed", ReplaceBoolean(jAccount["contract"]["deployed"].AsBoolean()));
                         int result = cmd.ExecuteNonQuery();
+
+                        contract_count++;
                     }
                     catch (MySqlException e)
                     {
@@ -158,6 +192,8 @@ namespace transfer_gui
                         cmd.Parameters.AddWithValue("@script", ReplaceNull(jAccount["contract"]["script"]));
                         cmd.Parameters.AddWithValue("@extra", ReplaceNull(jAccount["extra"]));
                         int result = cmd.ExecuteNonQuery();
+
+                        account_count++;
                     }
                     catch (MySqlException e)
                     {
@@ -165,21 +201,52 @@ namespace transfer_gui
                         return "Export Failed!";
                     }
 
-                    foreach (string name in ((NEP6Contract)account.Contract).ParameterNames)
+                    foreach (JObject parameter in account.Contract.ParameterList.Zip((account.Contract as NEP6Contract).ParameterNames, (type, name) =>
                     {
+                        JObject parameter = new JObject();
+                        parameter["name"] = name;
+                        parameter["type"] = type;
+                        return parameter;
+                    }))
+                    {
+                        check = true;
                         try
                         {
-                            // table parameter
-                            string cmdStr = "INSERT INTO neo.parameter VALUES(@name, @type);";
+                            // try get parameter
+                            string cmdStr = "SELECT name FROM neo.parameter where name=@name and type=@type;";
                             MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
-                            cmd.Parameters.AddWithValue("@name", ReplaceNull(name));
-                            cmd.Parameters.AddWithValue("@type", ReplaceNull(name));
-                            int result = cmd.ExecuteNonQuery();
+                            cmd.Parameters.AddWithValue("@name", ReplaceNull(parameter["name"].AsString()));
+                            cmd.Parameters.AddWithValue("@type", ReplaceNull(parameter["name"].AsString()));
+                            
+                            MySqlDataReader rdr = cmd.ExecuteReader();
+
+                            if (rdr.Read())
+                                if (rdr.HasRows)
+                                    check = false;
+                            rdr.Close();
                         }
                         catch (MySqlException e)
                         {
                             Console.WriteLine(e.StackTrace);
-                            return "Export Failed!";
+                            return "Query Failed!";
+                        }
+
+                        if (check)
+                        {
+                            try
+                            {
+                                // table parameter
+                                string cmdStr = "INSERT INTO neo.parameter VALUES(@name, @type);";
+                                MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
+                                cmd.Parameters.AddWithValue("@name", ReplaceNull(parameter["name"].AsString()));
+                                cmd.Parameters.AddWithValue("@type", ReplaceNull(parameter["type"].AsString()));
+                                int result = cmd.ExecuteNonQuery();
+                            }
+                            catch (MySqlException e)
+                            {
+                                Console.WriteLine(e.StackTrace);
+                                return "Export Failed!";
+                            }
                         }
 
                         try
@@ -188,8 +255,10 @@ namespace transfer_gui
                             string cmdStr = "INSERT INTO neo.contract2parameter VALUES(NULL, @script, @parameter_name);";
                             MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                             cmd.Parameters.AddWithValue("@script", ReplaceNull(jAccount["contract"]["script"]));
-                            cmd.Parameters.AddWithValue("@parameter_name", ReplaceNull(name));
+                            cmd.Parameters.AddWithValue("@parameter_name", ReplaceNull(parameter["name"].AsString()));
                             int result = cmd.ExecuteNonQuery();
+
+                            parameter_count++;
                         }
                         catch (MySqlException e)
                         {
@@ -201,9 +270,9 @@ namespace transfer_gui
 
                 conn.Close();
 
-                return jWallet.ToString().Replace("\n", "").Replace("\r", "").Replace("  ", " ");
+                return $"Export Success! Total: {wallet_count} wallet(s), {scrypt_count} scrypt(s), {account_count} account(s), {contract_count} contract(s), {parameter_count} parameter(s).";
             }
-            catch(MySqlException e)
+            catch (MySqlException e)
             {
                 Console.WriteLine(e.StackTrace);
                 return "Connect Failed!";

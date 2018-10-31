@@ -10,7 +10,6 @@ namespace transfer_gui
     static class Program
     {
         public static LocalNode LocalNode;
-        public static Wallet CurrentWallet;
         public static MainWindow MainWindow;
 
         ///<summary>

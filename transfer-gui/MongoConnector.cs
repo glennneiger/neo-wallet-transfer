@@ -32,7 +32,7 @@ namespace transfer_gui
 
                 collection.InsertOne(document);
 
-                return document.ToJson();
+                return "Export Success! Total: 1 wallet(s)";
             }
             catch (Exception e)
             {

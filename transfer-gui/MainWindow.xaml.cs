@@ -37,6 +37,11 @@ namespace transfer_gui
         {
             this.Loaded += new RoutedEventHandler(MainWindow_Loaded);
             InitializeComponent();
+
+            DispatcherTimer timeTicker = new DispatcherTimer();
+            timeTicker.Interval = new TimeSpan(0, 0, 1); //in Hour, Minutes, Second.
+            timeTicker.Tick += time_Tick;
+            timeTicker.Start();
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
@@ -158,13 +163,19 @@ namespace transfer_gui
             MySQLConnector mySQL = new MySQLConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
-                return mySQL.ExportNEP6Wallet(wallet as NEP6Wallet, path, password);
+                return mySQL.ExportNEP6Wallet(wallet as NEP6Wallet, password);
             }
             else
             {
                 //never reach here
             }
             return null;
+        }
+
+        private void time_Tick(object sender, EventArgs e)
+        {
+            lbl_height.Content = $"{Blockchain.Default.Height}/{Blockchain.Default.HeaderHeight}";
+            lbl_count_node.Content = Program.LocalNode.RemoteNodeCount.ToString();
         }
     }
 }
