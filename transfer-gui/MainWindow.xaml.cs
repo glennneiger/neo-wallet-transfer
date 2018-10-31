@@ -158,7 +158,7 @@ namespace transfer_gui
             MySQLConnector mySQL = new MySQLConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
-                return mySQL.ExportNEP6Wallet(path, password);
+                return mySQL.ExportNEP6Wallet(wallet as NEP6Wallet, path, password);
             }
             else
             {

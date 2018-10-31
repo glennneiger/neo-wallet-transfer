@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Neo.Implementations.Wallets.NEP6
 {
-    internal class NEP6Contract : Contract
+    public class NEP6Contract : Contract
     {
         public string[] ParameterNames;
         public bool Deployed;

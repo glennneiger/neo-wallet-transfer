@@ -201,6 +201,11 @@ namespace Neo.Implementations.Wallets.NEP6
 
         public override IEnumerable<WalletAccount> GetAccounts()
         {
+            return GetNEP6Accounts();
+        }
+
+        public IEnumerable<NEP6Account> GetNEP6Accounts()
+        {
             lock (accounts)
             {
                 foreach (NEP6Account account in accounts.Values)
@@ -362,6 +367,17 @@ namespace Neo.Implementations.Wallets.NEP6
             wallet["accounts"] = new JArray(accounts.Values.Select(p => p.ToJson()));
             wallet["extra"] = extra;
             File.WriteAllText(path, wallet.ToString());
+        }
+
+        public JObject ToJson()
+        {
+            JObject wallet = new JObject();
+            wallet["name"] = name;
+            wallet["version"] = version.ToString();
+            wallet["scrypt"] = Scrypt.ToJson();
+            wallet["accounts"] = new JArray(accounts.Values.Select(p => p.ToJson()));
+            wallet["extra"] = extra;
+            return wallet;
         }
 
         public IDisposable Unlock(string password)
