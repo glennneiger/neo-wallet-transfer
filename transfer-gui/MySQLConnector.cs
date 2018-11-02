@@ -33,10 +33,6 @@ namespace transfer_gui
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.parameter ( name VARCHAR(45), type VARCHAR(45), PRIMARY KEY(name))engine = innodb;";
-                cmd = new MySqlCommand(cmdStr, conn);
-                cmd.ExecuteNonQuery();
-
                 cmdStr = "CREATE TABLE IF NOT EXISTS neo.wallet ( uid INT AUTO_INCREMENT, name VARCHAR(45), version VARCHAR(10), scrypt_id INT, password VARCHAR(45), extra VARCHAR(45), PRIMARY KEY(uid)," +
                     " CONSTRAINT `scrypt_id1` FOREIGN KEY (`scrypt_id`) REFERENCES `scrypt` (`uid`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
@@ -48,9 +44,8 @@ namespace transfer_gui
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract2parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(1000), parameter_name VARCHAR(45), PRIMARY KEY(uid)," +
-                    " CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`)," +
-                    " CONSTRAINT `parameter_name1` FOREIGN KEY (`parameter_name`) REFERENCES `parameter` (`name`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(1000), name VARCHAR(45), type VARCHAR(45), PRIMARY KEY(uid)," +
+                    " CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
@@ -202,53 +197,14 @@ namespace transfer_gui
                         return parameter;
                     }))
                     {
-                        check = true;
                         try
                         {
-                            // try get parameter
-                            string cmdStr = "SELECT name FROM neo.parameter where name=@name and type=@type;";
-                            MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
-                            cmd.Parameters.AddWithValue("@name", ReplaceNull(parameter["name"].AsString()));
-                            cmd.Parameters.AddWithValue("@type", ReplaceNull(parameter["name"].AsString()));
-                            
-                            MySqlDataReader rdr = cmd.ExecuteReader();
-
-                            if (rdr.Read())
-                                if (rdr.HasRows)
-                                    check = false;
-                            rdr.Close();
-                        }
-                        catch (MySqlException e)
-                        {
-                            Console.WriteLine(e.StackTrace);
-                            return "Query Failed!";
-                        }
-
-                        if (check)
-                        {
-                            try
-                            {
-                                // table parameter
-                                string cmdStr = "INSERT INTO neo.parameter VALUES(@name, @type);";
-                                MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
-                                cmd.Parameters.AddWithValue("@name", ReplaceNull(parameter["name"].AsString()));
-                                cmd.Parameters.AddWithValue("@type", ReplaceNull(parameter["type"].AsString()));
-                                int result = cmd.ExecuteNonQuery();
-                            }
-                            catch (MySqlException e)
-                            {
-                                Console.WriteLine(e.StackTrace);
-                                return "Export Failed!";
-                            }
-                        }
-
-                        try
-                        {
-                            // table contract2parameter
-                            string cmdStr = "INSERT INTO neo.contract2parameter VALUES(NULL, @script, @parameter_name);";
+                            // table parameter
+                            string cmdStr = "INSERT INTO neo.parameter VALUES(NULL, @script, @name, @type);";
                             MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                             cmd.Parameters.AddWithValue("@script", ReplaceNull(jAccount["contract"]["script"]));
-                            cmd.Parameters.AddWithValue("@parameter_name", ReplaceNull(parameter["name"].AsString()));
+                            cmd.Parameters.AddWithValue("@name", ReplaceNull(parameter["name"].AsString()));
+                            cmd.Parameters.AddWithValue("@type", ReplaceNull(parameter["type"].AsString()));
                             int result = cmd.ExecuteNonQuery();
 
                             parameter_count++;
