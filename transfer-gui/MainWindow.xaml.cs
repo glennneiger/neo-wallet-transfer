@@ -1,5 +1,4 @@
 ﻿using Neo.Core;
-using Neo.Implementations.Blockchains.LevelDB;
 using Neo.Implementations.Wallets.NEP6;
 using Neo.Network;
 using Neo.Wallets;
@@ -7,6 +6,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -26,6 +26,13 @@ namespace transfer_gui
         private string path;
         private string password;
         private DBType dBType;
+        private int start_count = 0;
+        private int end_count = 0;
+
+        private MySQLConnector mySQL;
+        private MongoConnector mongo;
+
+        private Thread exportThread;
 
         ObservableCollection<RecordInfo> recordInfoList = new ObservableCollection<RecordInfo>();
         internal ObservableCollection<RecordInfo> RecordInfoList
@@ -61,47 +68,82 @@ namespace transfer_gui
                 MessageBox.Show("数据库连接字符串错误！");
                 return;
             }
-
-            string result = null;
-            switch (dBType)
+            if (dBType < DBType.MySQL || dBType > DBType.Mongo)
             {
-                case DBType.MySQL:
-                    result = ExportMySQL(wallet, path, password, connectionString);
-                    break;
-                case DBType.Mongo:
-                    result = ExportMongo(wallet, path, password, connectionString);
-                    break;
-                default:
-                    MessageBox.Show("未知的数据库类型");
-                    break;
+                MessageBox.Show("未知的数据库类型");
             }
 
-            this.Dispatcher.Invoke(DispatcherPriority.Send, new Action(() =>
+            UILock();
+
+            exportThread = new Thread(new ThreadStart(delegate
             {
-                this.RecordInfoList.Add(new RecordInfo(result));
-                this.listView.ScrollIntoView(this.listView.Items[this.listView.Items.Count - 1]);
-                GridView gv = listView.View as GridView;
-                if (gv != null)
+                string result = null;
+                try
                 {
-                    foreach (GridViewColumn gvc in gv.Columns)
+                    switch (dBType)
                     {
-                        gvc.Width = gvc.ActualWidth;
-                        gvc.Width = Double.NaN;
+                        case DBType.MySQL:
+                            result = ExportMySQL(wallet, path, password, connectionString);
+                            break;
+                        case DBType.Mongo:
+                            result = ExportMongo(wallet, path, password, connectionString);
+                            break;
+                        default:
+                            result = "Export Failed!";
+                            break;
                     }
                 }
+                catch (ThreadAbortException)
+                {
+                    result = "Export Terminated!";
+                }
+                finally
+                {
+                    this.Dispatcher.Invoke(DispatcherPriority.Send, new Action(() =>
+                    {
+                        this.RecordInfoList.Add(new RecordInfo(result));
+                        this.listView.ScrollIntoView(this.listView.Items[this.listView.Items.Count - 1]);
+                        GridView gv = listView.View as GridView;
+                        if (gv != null)
+                        {
+                            foreach (GridViewColumn gvc in gv.Columns)
+                            {
+                                gvc.Width = gvc.ActualWidth;
+                                gvc.Width = Double.NaN;
+                            }
+                        }
+                        UIUnLock();
+                    }));
+                }
             }));
+            exportThread.Start();
         }
 
-        void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             LocalNode.UpnpEnabled = true;
             LocalNode.Start(Settings.Default.NodePort);
             listView.ItemsSource = RecordInfoList;
         }
 
+        private void UILock()
+        {
+            this.btnStart.IsEnabled = false;
+            this.btnConfig.IsEnabled = false;
+        }
+
+        private void UIUnLock()
+        {
+            this.btnStart.IsEnabled = true;
+            this.btnConfig.IsEnabled = true;
+        }
+
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
-
+            if (exportThread != null)
+            {
+                exportThread.Abort();
+            }
         }
 
         private void btnConfig_Click(object sender, RoutedEventArgs e)
@@ -143,9 +185,9 @@ namespace transfer_gui
             }
         }
 
-        private static string ExportMongo(Wallet wallet, string path, string password, string connectionString)
+        private string ExportMongo(Wallet wallet, string path, string password, string connectionString)
         {
-            MongoConnector mongo = new MongoConnector(connectionString);
+            mongo = new MongoConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
                 return mongo.ExportNEP6Wallet(path, password);
@@ -158,9 +200,9 @@ namespace transfer_gui
             return null;
         }
 
-        private static string ExportMySQL(Wallet wallet, string path, string password, string connectionString)
+        private string ExportMySQL(Wallet wallet, string path, string password, string connectionString)
         {
-            MySQLConnector mySQL = new MySQLConnector(connectionString);
+            mySQL = new MySQLConnector(connectionString);
             if (wallet is NEP6Wallet)
             {
                 return mySQL.ExportNEP6Wallet(wallet as NEP6Wallet, password);
@@ -176,6 +218,13 @@ namespace transfer_gui
         {
             lbl_height.Content = $"{Blockchain.Default.Height}/{Blockchain.Default.HeaderHeight}";
             lbl_count_node.Content = Program.LocalNode.RemoteNodeCount.ToString();
+
+            if (mySQL != null)
+            {
+                end_count = mySQL.Count;
+                lbl_speed.Content = end_count - start_count;
+                start_count = end_count;
+            }
         }
     }
 }

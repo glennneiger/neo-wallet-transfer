@@ -11,6 +11,11 @@ namespace transfer_gui
     class MySQLConnector
     {
         private MySqlConnection conn;
+        private int count = 0;
+        public int Count
+        {
+            get { return count; }
+        }
 
         public MySQLConnector(string connectionString)
         {
@@ -194,6 +199,7 @@ namespace transfer_gui
                         int result = cmd.ExecuteNonQuery();
 
                         account_count++;
+                        count = account_count;
                     }
                     catch (MySqlException e)
                     {
