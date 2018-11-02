@@ -37,15 +37,20 @@ namespace transfer_gui
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.wallet ( uid INT AUTO_INCREMENT, name VARCHAR(45), version VARCHAR(10), scrypt_id INT, password VARCHAR(45), extra VARCHAR(45), PRIMARY KEY(uid), CONSTRAINT `scrypt_id1` FOREIGN KEY (`scrypt_id`) REFERENCES `scrypt` (`uid`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.wallet ( uid INT AUTO_INCREMENT, name VARCHAR(45), version VARCHAR(10), scrypt_id INT, password VARCHAR(45), extra VARCHAR(45), PRIMARY KEY(uid)," +
+                    " CONSTRAINT `scrypt_id1` FOREIGN KEY (`scrypt_id`) REFERENCES `scrypt` (`uid`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.account ( address VARCHAR(45), label VARCHAR(45), isDefault TINYINT(1), locked TINYINT(1), account_key VARCHAR(100), contract_script VARCHAR(1000), extra VARCHAR(45), PRIMARY KEY(address), CONSTRAINT `contract_script1` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.account ( address VARCHAR(45), label VARCHAR(45), isDefault TINYINT(1), locked TINYINT(1), account_key VARCHAR(100), contract_script VARCHAR(1000), wallet_id INT, extra VARCHAR(45), PRIMARY KEY(address)," +
+                    " CONSTRAINT `wallet_id1` FOREIGN KEY (`wallet_id`) REFERENCES `wallet` (`uid`)," +
+                    " CONSTRAINT `contract_script1` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
-                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract2parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(1000), parameter_name VARCHAR(45), PRIMARY KEY(uid), CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`), CONSTRAINT `parameter_name1` FOREIGN KEY (`parameter_name`) REFERENCES `parameter` (`name`))engine = innodb;";
+                cmdStr = "CREATE TABLE IF NOT EXISTS neo.contract2parameter ( uid INT AUTO_INCREMENT, contract_script VARCHAR(1000), parameter_name VARCHAR(45), PRIMARY KEY(uid)," +
+                    " CONSTRAINT `contract_script2` FOREIGN KEY (`contract_script`) REFERENCES `contract` (`script`)," +
+                    " CONSTRAINT `parameter_name1` FOREIGN KEY (`parameter_name`) REFERENCES `parameter` (`name`))engine = innodb;";
                 cmd = new MySqlCommand(cmdStr, conn);
                 cmd.ExecuteNonQuery();
 
@@ -72,6 +77,7 @@ namespace transfer_gui
 
                 JObject jWallet = wallet.ToJson();
 
+                int scrypt_id = 0;
                 bool check = true;
                 try
                 {
@@ -85,7 +91,10 @@ namespace transfer_gui
 
                     if (rdr.Read())
                         if (rdr.HasRows)
+                        {
                             check = false;
+                            scrypt_id = rdr.GetInt32("uid");
+                        }
                     rdr.Close();
 
                     scrypt_count++;
@@ -107,6 +116,8 @@ namespace transfer_gui
                         cmd.Parameters.AddWithValue("@r", ReplaceNull(jWallet["scrypt"]["r"]));
                         cmd.Parameters.AddWithValue("@p", ReplaceNull(jWallet["scrypt"]["n"]));
                         int result = cmd.ExecuteNonQuery();
+
+                        scrypt_id = (int)cmd.LastInsertedId;
                     }
                     catch (MySqlException e)
                     {
@@ -115,33 +126,7 @@ namespace transfer_gui
                     }
                 }
 
-                int scrypt_id = 0;
-                try
-                {
-                    // get scrypt uid
-                    string cmdStr = "SELECT uid FROM neo.scrypt WHERE n=@n and r=@r and p=@p;";
-                    MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
-                    cmd.Parameters.AddWithValue("@n", ReplaceNull(jWallet["scrypt"]["n"]));
-                    cmd.Parameters.AddWithValue("@r", ReplaceNull(jWallet["scrypt"]["r"]));
-                    cmd.Parameters.AddWithValue("@p", ReplaceNull(jWallet["scrypt"]["n"]));
-                    MySqlDataReader rdr = cmd.ExecuteReader();
-
-                    if (rdr.Read())
-                        if (rdr.HasRows)
-                            scrypt_id = rdr.GetInt32("uid");
-                    rdr.Close();
-
-                    if (scrypt_id == 0)
-                    {
-                        return "Query Failed!";
-                    }
-                }
-                catch (MySqlException e)
-                {
-                    Console.WriteLine(e.StackTrace);
-                    return "Query Failed!";
-                }
-
+                int wallet_id = 0;
                 try
                 {
                     // table wallet
@@ -154,6 +139,7 @@ namespace transfer_gui
                     cmd.Parameters.AddWithValue("@extra", ReplaceNull(jWallet["extra"]));
                     int result = cmd.ExecuteNonQuery();
 
+                    wallet_id = (int)cmd.LastInsertedId;
                     wallet_count++;
                 }
                 catch (MySqlException e)
@@ -187,7 +173,7 @@ namespace transfer_gui
                     try
                     {
                         // table account
-                        string cmdStr = "INSERT INTO neo.account VALUES(@address, @label, @isDefault, @lock, @key, @script, @extra);";
+                        string cmdStr = "INSERT INTO neo.account VALUES(@address, @label, @isDefault, @lock, @key, @script, @wallet_id, @extra);";
                         MySqlCommand cmd = new MySqlCommand(cmdStr, conn);
                         cmd.Parameters.AddWithValue("@address", ReplaceNull(jAccount["address"]));
                         cmd.Parameters.AddWithValue("@label", ReplaceNull(jAccount["label"]));
@@ -195,6 +181,7 @@ namespace transfer_gui
                         cmd.Parameters.AddWithValue("@lock", ReplaceBoolean(jAccount["lock"].AsBoolean()));
                         cmd.Parameters.AddWithValue("@key", ReplaceNull(jAccount["key"]));
                         cmd.Parameters.AddWithValue("@script", ReplaceNull(jAccount["contract"]["script"]));
+                        cmd.Parameters.AddWithValue("@wallet_id", ReplaceNull(wallet_id));
                         cmd.Parameters.AddWithValue("@extra", ReplaceNull(jAccount["extra"]));
                         int result = cmd.ExecuteNonQuery();
 
