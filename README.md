@@ -18,19 +18,21 @@ This program is built to transfer Neo wallet file of native Neo client(neo-cli a
 
 ## Notice
 
-1. Sync the blockchain first if some data maybe necessary in the transfer process, in the same way like neo-cli.
+1. Sync the blockchain first if some data maybe necessary in the transfer process, in the same way like neo-cli. The files maybe needed are `config.json`, `protocol.json` and `libleveldb.dll`. Copy these files into `bin` folder after build the project.
 
-2. An addtional `.json` wallet will be created if you are tranfering a `.db3` wallet, and the final result will be based on NEP6 Standard.
+2. If you don't want to connect to any blockchain, just clear the `seedList` or set a wrong protocol.
 
-3. You can transfer multiple wallets in a time.
+3. An addtional `.json` wallet will be created if you are tranfering a `.db3` wallet, and the final result will be based on NEP6 Standard.
 
-4. Don't use duplicated accounts, they will produce errors. And if so, you have to delete the whole db and start again.
+4. You can transfer multiple wallets in a time.
 
-5. This project is based on neo-v2.8.0 source code, and some part of which is changed in the privacy to achieve the goal.
+5. Don't use duplicated accounts, they will produce errors. And if so, you have to delete the whole db and start again.
 
-6. No index is added to any of these databases.
+6. This project is based on neo-v2.8.0 source code, and some part of which is changed in the privacy to achieve the goal.
 
-7. The result message is based on the NEP6 wallet structure and just count how many records are processed properly while doesn't represent the real data structure in the database.
+7. No index is added to any of these databases.
+
+8. The result message is based on the NEP6 wallet structure and just count how many records are processed properly while doesn't represent the real data structure in the database.
 
 ## MySQL Table Structure
 
